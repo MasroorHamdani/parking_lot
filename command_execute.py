@@ -105,7 +105,6 @@ class CommandExecute():
                 #return success status : Allocated slot number 3 (ex)
                 output = 'Allocated slot number: {}'.format(slot)
                 print(output)
-                
         else:
             output = 'Please Enter Valid Command'
             print(output)
@@ -113,35 +112,46 @@ class CommandExecute():
 
     def leave(self, cmd):
         slot = cmd[1] if len(cmd) >=2 else ''
-        regisNum = self.by_parkslot[int(slot)].get('regisNum')
-        color = self.by_parkslot[int(slot)].get('color')
-        # delete the teriary dependency  data 
-        del self.by_regisNum_parkslot[regisNum]  # deletes regist->parkinglot map
-        # remove the slot against color  if exits 
-        try:
-            self.by_color_parkslot[color].remove(int(slot))
-        except Exception as ex:
-            # shouldnt arise unless spurious entry vs exit mechanism
-            print("Error - there{}".format(ex))
-            return
-        try:
-            self.by_color_regisNum[color].remove(regisNum)
-        except Exception as ex:
-            print("Error - here {}".format(ex))
-            return
-        # delete the primary data resource entry
-        del self.by_parkslot[int(slot)]
-        # insert new empty parling slot
-        self.empty_parkslot.append(int(slot))
-        output = 'Slot number {} is free'.format(slot)
-        print(output)
+        if slot:
+            regisNum = ''
+            color = ''
+            if self.by_parkslot.get(int(slot)):
+                regisNum = self.by_parkslot.get(int(slot)).get('regisNum')
+                color = self.by_parkslot.get(int(slot)).get('color')
+                # delete the teriary dependency  data 
+                del self.by_regisNum_parkslot[regisNum]  # deletes regist->parkinglot map
+                # remove the slot against color  if exits 
+                try:
+                    self.by_color_parkslot[color].remove(int(slot))
+                except Exception as ex:
+                    # shouldnt arise unless spurious entry vs exit mechanism
+                    print("Error - there{}".format(ex))
+                    return
+                try:
+                    self.by_color_regisNum[color].remove(regisNum)
+                except Exception as ex:
+                    print("Error - here {}".format(ex))
+                    return
+                # delete the primary data resource entry
+                del self.by_parkslot[int(slot)]
+                # insert new empty parling slot
+                self.empty_parkslot.append(int(slot))
+                output = 'Slot number {} is free'.format(slot)
+                print(output)
+            else:
+                output = "Not Found"
+                print(output)
+        else:
+            output = 'Please Enter Valid Command'
+            print(output)
         return output
 
     def status(self, cmd):
         print('Slot No, \t Registration No \t Colour')
         for key, value in self.by_parkslot.items():
-            print('{}, \t\t {} \t\t {}'.format(key, value.get('regisNum'), value.get('color')))
-        return
+            output = '{}, \t\t {} \t\t {}'.format(key, value.get('regisNum'), value.get('color'))
+            print(output)
+        return output
 
     def registration_numbers_for_cars_with_colour(self, cmd):
         color = cmd[1] if len(cmd) >=2 else ''
@@ -156,7 +166,7 @@ class CommandExecute():
         else:
             output = "Please pass Valid Color"
             print(output)
-        return
+        return output
 
     def slot_numbers_for_cars_with_colour(self, cmd):
         color = cmd[1] if len(cmd) >=2 else ''
@@ -179,8 +189,11 @@ class CommandExecute():
         if regis:
             if park_lot:
                 print(park_lot)
+                output = park_lot
             else:
-                print('Not Found')
+                output = 'Not Found'
+                print(output)
         else:
-            print("Please pass Valid Registarion number")
-        return
+            output = "Please pass Valid Registarion number"
+            print(output)
+        return output

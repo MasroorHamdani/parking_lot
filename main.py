@@ -26,7 +26,7 @@ def main():
                 # command_execute_obj.execute_file(cmd_list)
         else:
             while True:
-                cmd_input = input("Press Enter the command..\n")
+                cmd_input = input() #"Please Enter the command..\n"
                 cmd_list = cmd_input.split()
                 if cmd_list[0] == 'exit':
                     break
