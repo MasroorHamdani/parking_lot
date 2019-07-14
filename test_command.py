@@ -111,7 +111,7 @@ class TestCommand(unittest.TestCase):
         cmd = 'leave 7'
         cmd_list = cmd.split()
         result = command_execute_obj.leave(cmd_list)
-        expected_result = "Not Found"
+        expected_result = "Not found"
         self.assertEqual(expected_result, result)
 
     def test_park_status(self):
@@ -143,7 +143,7 @@ class TestCommand(unittest.TestCase):
         cmd = 'registration_numbers_for_cars_with_colour Red'
         cmd_list = cmd.split()
         result = command_execute_obj.registration_numbers_for_cars_with_colour(cmd_list)
-        expected_result = ['KA-01-HH-1234']
+        expected_result = 'KA-01-HH-1234'
         self.assertEqual(expected_result, result)
 
     def test_park_reg_with_color_insensitive(self):
@@ -162,7 +162,7 @@ class TestCommand(unittest.TestCase):
         cmd = 'registration_numbers_for_cars_with_colour white'
         cmd_list = cmd.split()
         result = command_execute_obj.registration_numbers_for_cars_with_colour(cmd_list)
-        expected_result = 'Not Found'
+        expected_result = 'Not found'
         self.assertEqual(expected_result, result)
 
     def test_park_reg_with_color_invalid_param(self):
@@ -197,7 +197,7 @@ class TestCommand(unittest.TestCase):
         cmd = 'slot_numbers_for_cars_with_colour Blue'
         cmd_list = cmd.split()
         result = command_execute_obj.slot_numbers_for_cars_with_colour(cmd_list)
-        expected_result = [1]
+        expected_result = '1'
         self.assertEqual(expected_result, result)
 
     def test_park_slot_with_color_invalid_param(self):
@@ -229,7 +229,7 @@ class TestCommand(unittest.TestCase):
         cmd = 'slot_numbers_for_cars_with_colour Green'
         cmd_list = cmd.split()
         result = command_execute_obj.slot_numbers_for_cars_with_colour(cmd_list)
-        expected_result = "Not Found"
+        expected_result = "Not found"
         self.assertEqual(expected_result, result)
 
     def test_park_slot_with_reg(self):
@@ -277,7 +277,7 @@ class TestCommand(unittest.TestCase):
         cmd = 'slot_number_for_registration_number KK-01-11-NH'
         cmd_list = cmd.split()
         result = command_execute_obj.slot_number_for_registration_number(cmd_list)
-        expected_result = "Not Found"
+        expected_result = "Not found"
         self.assertEqual(expected_result, result)
 
 if __name__ == "__main__":

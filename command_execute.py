@@ -139,7 +139,7 @@ class CommandExecute():
                 output = 'Slot number {} is free'.format(slot)
                 print(output)
             else:
-                output = "Not Found"
+                output = "Not found"
                 print(output)
         else:
             output = 'Please Enter Valid Command'
@@ -158,10 +158,10 @@ class CommandExecute():
         slot_list = self.by_color_regisNum.get(color)
         if color:
             if slot_list:
-                print(slot_list)
-                output = slot_list
+                output = ', '.join(slot_list)
+                print(output)
             else:
-                output = "Not Found"
+                output = "Not found"
                 print(output)
         else:
             output = "Please pass Valid Color"
@@ -173,10 +173,10 @@ class CommandExecute():
         slot_list = self.by_color_parkslot.get(color)
         if color:
             if slot_list:
-                print(slot_list)
-                output = slot_list
+                output = ', '.join(str(x) for x in slot_list)
+                print(output)
             else:
-                output = 'Not Found'
+                output = 'Not found'
                 print(output)
         else:
             output = "Please pass Valid Color"
@@ -191,7 +191,7 @@ class CommandExecute():
                 print(park_lot)
                 output = park_lot
             else:
-                output = 'Not Found'
+                output = 'Not found'
                 print(output)
         else:
             output = "Please pass Valid Registarion number"
