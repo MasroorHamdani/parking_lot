@@ -3,8 +3,7 @@ import sys, os
 
 from command_execute import CommandExecute
 
-command_execute_obj = CommandExecute()
-
+command_execute_obj = CommandExecute(12)
 
 def main():
     """
@@ -17,14 +16,21 @@ def main():
         if file_path:
             cmd_list = []
             if os.path.isfile(file_path):
-                cmd_list = open(file_path, 'r')
-                command_execute_obj.execute_file(cmd_list)
+                f = open(file_path, 'r')
+                lines = f.readlines()
+                f.close()
+                # for line in lines:
+                #     cmd_list = line.split()
+                command_execute_obj.execute_file(lines)
+                # cmd_list = cmd_list.split()
+                # command_execute_obj.execute_file(cmd_list)
         else:
             while True:
-                cmd = input("Press Enter the command..\n")
-                if cmd == 'exit':
+                cmd_input = input("Press Enter the command..\n")
+                cmd_list = cmd_input.split()
+                if cmd_list[0] == 'exit':
                     break
-                command_execute_obj.execute_command(cmd)
+                command_execute_obj.execute_command(cmd_list)
     except Exception as e:
         print("Error Occured {}".format(e))
 
