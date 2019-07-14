@@ -9,11 +9,16 @@ class CommandExecute():
     def __init__(self, maxParking = 6): #default kept at 10
         # parking slot number --> registration plate and color 
         self.by_parkslot = {}
-        # color --> registration plate number, parking slot
-        self.by_color_regis_parkslot ={}
-        # empty slot numbers : All are empty at the start
+        #color --> registration number
+        self.by_color_regisNum = {}
+        # color -->  parking slot
+        self.by_color_parkslot ={}    
         # registration plate number --> parking slot number        
         self.by_regisNum_parkslot = {}
+        # parking slot capacity : default at 10
+        self.parkslot_capacity = 0
+
+        # empty slot numbers : All are empty at the start
         self.maxParking = maxParking
         self.empty_parkslot = list(range(1, maxParking+1))
 
@@ -34,8 +39,9 @@ class CommandExecute():
         For valid command those will be sent to switch to be redirfected to relavant function
         """
         if cmd[0] not in COMMANDS:
-            print('Invalid Command Passed')
-            return 'Invalid Command Passed'
+            output = 'Invalid Command Passed'
+            print(output)
+            return output
         return self.switch(cmd)
 
     def switch(self, cmd):
@@ -52,13 +58,15 @@ class CommandExecute():
         """
         maxParking = cmd[1] if len(cmd) >=2 else ''
         if len(cmd) < 2:
-            print('Please Enter valid Max limit')
             output = 'Please Enter valid Max limit' 
+            print(output)
+            
         else:
             self.maxParking = maxParking
             self.empty_parkslot = list(range(1, int(maxParking)+1))
-            print("Created a parking lot with {} slots".format(maxParking))
             output = "Created a parking lot with {} slots".format(maxParking) 
+            print(output)
+            
         return output
 
     def park(self, cmd):
@@ -69,54 +77,65 @@ class CommandExecute():
         vehicle_details = {}
         vehicle_details['regisNum'] = cmd[1] if len(cmd) >=2 else ''
         vehicle_details['color'] = cmd[2] if len(cmd) >=3 else ''
+        if vehicle_details.get('regisNum') and vehicle_details.get('color'):
+            # check if available space in parking lot 
+            if len(self.empty_parkslot) == 0: # if no parking space available
+                # return status :  Sorry, parking lot is full
+                output = 'Sorry, parking lot is full'
+                print(output)
+            else:
+                # sort the empty parking list : ascending order
+                self.empty_parkslot.sort()
+                # parking slot number for incoming vehicle
+                # allocate the slot with minimum value : as suggested
+                slot = self.empty_parkslot.pop(0)
 
-        # check if available space in parking lot 
-        if len(self.empty_parkslot) == 0: # if no parking space available
-            # return status :  Sorry, parking lot is full
-            print('Sorry, parking lot is full')
+                # registration number 
+                regisNum = vehicle_details['regisNum']
+                # incoming vehicle color
+                color = vehicle_details['color']
+                # insert all the details against search keys on parking slot num
+                self.by_parkslot[slot]  = {'regisNum': regisNum, 'color':color}
+
+                # tertiary storage: insert to other mapped fast query storage
+                self.by_color_parkslot.setdefault(color,[]).append(slot)
+                self.by_color_regisNum.setdefault(color,[]).append(regisNum)
+                self.by_regisNum_parkslot[regisNum] = slot
+
+                #return success status : Allocated slot number 3 (ex)
+                output = 'Allocated slot number: {}'.format(slot)
+                print(output)
+                
         else:
-            # sort the empty parking list : ascending order
-            self.empty_parkslot.sort()
-            # parking slot number for incoming vehicle
-            # allocate the slot with minimum value : as suggested
-            print(self.empty_parkslot)
-            slot = self.empty_parkslot.pop(0)
-            # registration number 
-            regisNum = vehicle_details['regisNum']
-            # incoming vehicle color
-            color = vehicle_details['color']
-            # insert all the details against search keys on parking slot num
-            self.by_parkslot[slot]  = {'regisNum': regisNum, 'color':color}
-
-            # tertiary storage: insert to other mapped fast query storage
-            #self.by_color_regis_parkslot[color] = {'regisNum':regisNum, 'slot':slot}
-            self.by_color_regis_parkslot.setdefault(color,[]).append(slot)
-            self.by_regisNum_parkslot[regisNum] = slot
-
-            #return success status : Allocated slot number 3 (ex)
-            print('Allocated slot number: {}'.format(slot))
-        return
+            output = 'Please Enter Valid Command'
+            print(output)
+        return output
 
     def leave(self, cmd):
         slot = cmd[1] if len(cmd) >=2 else ''
-        print(slot, self.by_parkslot, self.by_parkslot.get('1'))
-        regisNum = self.by_parkslot[slot]['regisNum']
-        color = self.by_parkslot[slot]['color']
-        print(regisNum, color)
+        regisNum = self.by_parkslot[int(slot)].get('regisNum')
+        color = self.by_parkslot[int(slot)].get('color')
         # delete the teriary dependency  data 
         del self.by_regisNum_parkslot[regisNum]  # deletes regist->parkinglot map
         # remove the slot against color  if exits 
         try:
-            self.by_color_regis_parkslot[color].remove(slot)
-            print("Slot number {} is free".format(slot))
-        except:
+            self.by_color_parkslot[color].remove(int(slot))
+        except Exception as ex:
             # shouldnt arise unless spurious entry vs exit mechanism
-            pass
-
+            print("Error - there{}".format(ex))
+            return
+        try:
+            self.by_color_regisNum[color].remove(regisNum)
+        except Exception as ex:
+            print("Error - here {}".format(ex))
+            return
         # delete the primary data resource entry
-        del self.by_parkslot[slot]
+        del self.by_parkslot[int(slot)]
         # insert new empty parling slot
-        self.empty_parkslot.append(slot)
+        self.empty_parkslot.append(int(slot))
+        output = 'Slot number {} is free'.format(slot)
+        print(output)
+        return output
 
     def status(self, cmd):
         print('Slot No, \t Registration No \t Colour')
@@ -126,31 +145,33 @@ class CommandExecute():
 
     def registration_numbers_for_cars_with_colour(self, cmd):
         color = cmd[1] if len(cmd) >=2 else ''
-        slot_list = self.by_color_regis_parkslot.get(color)
+        slot_list = self.by_color_regisNum.get(color)
         if color:
             if slot_list:
-                slots = ''
-                for slot in slot_list:
-                    slots = "{}, {}".format(slots, self.by_parkslot[slot].get('regisNum'))
-                print(slots.strip())
+                print(slot_list)
+                output = slot_list
             else:
-                print("Not Found")
+                output = "Not Found"
+                print(output)
         else:
-            print("Please pass Valid Color")
+            output = "Please pass Valid Color"
+            print(output)
         return
 
     def slot_numbers_for_cars_with_colour(self, cmd):
         color = cmd[1] if len(cmd) >=2 else ''
-        slot_list = self.by_color_regis_parkslot.get(color)
+        slot_list = self.by_color_parkslot.get(color)
         if color:
             if slot_list:
-                for slot in slot_list:
-                    print(slot)
+                print(slot_list)
+                output = slot_list
             else:
-                print('Not Found')
+                output = 'Not Found'
+                print(output)
         else:
-            print("Please pass Valid Color")
-        return
+            output = "Please pass Valid Color"
+            print(output)
+        return output
 
     def slot_number_for_registration_number(self, cmd):
         regis = cmd[1] if len(cmd) >=2 else ''
@@ -163,6 +184,3 @@ class CommandExecute():
         else:
             print("Please pass Valid Registarion number")
         return
-
-    # def invalid_cmd(self, cmd):
-    #     print('Invalid Command Passed')
