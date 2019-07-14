@@ -6,7 +6,7 @@ class CommandExecute():
     """
     This class will handle all the commands to be executed
     """
-    def __init__(self, maxParking = 10): #default kept at 10
+    def __init__(self, maxParking = 6): #default kept at 10
         # parking slot number --> registration plate and color 
         self.by_parkslot = {}
         # color --> registration plate number, parking slot
@@ -25,7 +25,7 @@ class CommandExecute():
         """
         for line in cmd_list:
             command_array = line.split()
-            print(self.execute_command(command_array))
+            self.execute_command(command_array)
 
     def execute_command(self, cmd):
         """
@@ -35,7 +35,7 @@ class CommandExecute():
         """
         if cmd[0] not in COMMANDS:
             print('Invalid Command Passed')
-            return
+            return 'Invalid Command Passed'
         return self.switch(cmd)
 
     def switch(self, cmd):
@@ -51,8 +51,15 @@ class CommandExecute():
         Create the space for parking lot, depeing on the number passed
         """
         maxParking = cmd[1] if len(cmd) >=2 else ''
-        self.maxParking = maxParking
-        return "Created a parking lot with {} slots".format(maxParking)
+        if len(cmd) < 2:
+            print('Please Enter valid Max limit')
+            output = 'Please Enter valid Max limit' 
+        else:
+            self.maxParking = maxParking
+            self.empty_parkslot = list(range(1, int(maxParking)+1))
+            print("Created a parking lot with {} slots".format(maxParking))
+            output = "Created a parking lot with {} slots".format(maxParking) 
+        return output
 
     def park(self, cmd):
         """
@@ -64,14 +71,15 @@ class CommandExecute():
         vehicle_details['color'] = cmd[2] if len(cmd) >=3 else ''
 
         # check if available space in parking lot 
-        if len(self.empty_parkslot) == []: # if no parking space available
+        if len(self.empty_parkslot) == 0: # if no parking space available
             # return status :  Sorry, parking lot is full
-            return 'Sorry, parking lot is full' 
+            print('Sorry, parking lot is full')
         else:
             # sort the empty parking list : ascending order
             self.empty_parkslot.sort()
             # parking slot number for incoming vehicle
             # allocate the slot with minimum value : as suggested
+            print(self.empty_parkslot)
             slot = self.empty_parkslot.pop(0)
             # registration number 
             regisNum = vehicle_details['regisNum']
@@ -91,6 +99,7 @@ class CommandExecute():
 
     def leave(self, cmd):
         slot = cmd[1] if len(cmd) >=2 else ''
+        print(slot, self.by_parkslot, self.by_parkslot.get('1'))
         regisNum = self.by_parkslot[slot]['regisNum']
         color = self.by_parkslot[slot]['color']
         print(regisNum, color)
@@ -99,6 +108,7 @@ class CommandExecute():
         # remove the slot against color  if exits 
         try:
             self.by_color_regis_parkslot[color].remove(slot)
+            print("Slot number {} is free".format(slot))
         except:
             # shouldnt arise unless spurious entry vs exit mechanism
             pass
@@ -109,22 +119,49 @@ class CommandExecute():
         self.empty_parkslot.append(slot)
 
     def status(self, cmd):
-        print(self.by_parkslot)
+        print('Slot No, \t Registration No \t Colour')
+        for key, value in self.by_parkslot.items():
+            print('{}, \t\t {} \t\t {}'.format(key, value.get('regisNum'), value.get('color')))
         return
 
     def registration_numbers_for_cars_with_colour(self, cmd):
         color = cmd[1] if len(cmd) >=2 else ''
-        print(self.by_parkslot[self.by_color_regis_parkslot[color]])
+        slot_list = self.by_color_regis_parkslot.get(color)
+        if color:
+            if slot_list:
+                slots = ''
+                for slot in slot_list:
+                    slots = "{}, {}".format(slots, self.by_parkslot[slot].get('regisNum'))
+                print(slots.strip())
+            else:
+                print("Not Found")
+        else:
+            print("Please pass Valid Color")
         return
 
     def slot_numbers_for_cars_with_colour(self, cmd):
         color = cmd[1] if len(cmd) >=2 else ''
-        print(self.by_color_regis_parkslot[color])
+        slot_list = self.by_color_regis_parkslot.get(color)
+        if color:
+            if slot_list:
+                for slot in slot_list:
+                    print(slot)
+            else:
+                print('Not Found')
+        else:
+            print("Please pass Valid Color")
         return
 
     def slot_number_for_registration_number(self, cmd):
         regis = cmd[1] if len(cmd) >=2 else ''
-        print(self.by_regisNum_parkslot[regis])
+        park_lot = self.by_regisNum_parkslot.get(regis)
+        if regis:
+            if park_lot:
+                print(park_lot)
+            else:
+                print('Not Found')
+        else:
+            print("Please pass Valid Registarion number")
         return
 
     # def invalid_cmd(self, cmd):

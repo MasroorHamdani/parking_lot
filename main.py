@@ -3,7 +3,7 @@ import sys, os
 
 from command_execute import CommandExecute
 
-command_execute_obj = CommandExecute(12)
+command_execute_obj = CommandExecute()
 
 def main():
     """
