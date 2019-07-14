@@ -72,31 +72,28 @@ class CommandExecute():
             self.empty_parkslot.sort()
             # parking slot number for incoming vehicle
             # allocate the slot with minimum value : as suggested
-            print(self.empty_parkslot)
             slot = self.empty_parkslot.pop(0)
-            print(slot)
             # registration number 
             regisNum = vehicle_details['regisNum']
             # incoming vehicle color
             color = vehicle_details['color']
             # insert all the details against search keys on parking slot num
             self.by_parkslot[slot]  = {'regisNum': regisNum, 'color':color}
-            #
+
             # tertiary storage: insert to other mapped fast query storage
             #self.by_color_regis_parkslot[color] = {'regisNum':regisNum, 'slot':slot}
             self.by_color_regis_parkslot.setdefault(color,[]).append(slot)
             self.by_regisNum_parkslot[regisNum] = slot
 
-
             #return success status : Allocated slot number 3 (ex)
-            return 'Allocated slot number: {}'.format(slot)
+            print('Allocated slot number: {}'.format(slot))
+        return
 
     def leave(self, cmd):
-        print(cmd)
         slot = cmd[1] if len(cmd) >=2 else ''
-        print(slot)
         regisNum = self.by_parkslot[slot]['regisNum']
         color = self.by_parkslot[slot]['color']
+        print(regisNum, color)
         # delete the teriary dependency  data 
         del self.by_regisNum_parkslot[regisNum]  # deletes regist->parkinglot map
         # remove the slot against color  if exits 
@@ -112,15 +109,23 @@ class CommandExecute():
         self.empty_parkslot.append(slot)
 
     def status(self, cmd):
-        return self.by_parkslot
+        print(self.by_parkslot)
+        return
 
     def registration_numbers_for_cars_with_colour(self, cmd):
-        print(cmd)
+        color = cmd[1] if len(cmd) >=2 else ''
+        print(self.by_parkslot[self.by_color_regis_parkslot[color]])
+        return
 
     def slot_numbers_for_cars_with_colour(self, cmd):
-        print(cmd)
+        color = cmd[1] if len(cmd) >=2 else ''
+        print(self.by_color_regis_parkslot[color])
+        return
 
     def slot_number_for_registration_number(self, cmd):
-        print(cmd)
+        regis = cmd[1] if len(cmd) >=2 else ''
+        print(self.by_regisNum_parkslot[regis])
+        return
+
     # def invalid_cmd(self, cmd):
     #     print('Invalid Command Passed')
