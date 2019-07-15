@@ -147,9 +147,9 @@ class CommandExecute():
         return output
 
     def status(self, cmd):
-        print('Slot No, \t Registration No \t Colour')
+        print('Slot No.    Registration No    Colour')
         for key, value in self.by_parkslot.items():
-            output = '{}, \t\t {} \t\t {}'.format(key, value.get('regisNum'), value.get('color'))
+            output = '{}           {}      {}'.format(key, value.get('regisNum'), value.get('color'))
             print(output)
         return output
 
